@@ -39,5 +39,5 @@ public class ReflectingActivity : Activity
         }
 
         DisplayEndingMessage();
-    }
+    }
 }

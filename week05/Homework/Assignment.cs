@@ -17,5 +17,5 @@ public class Assignment
     public string GetStudentName()
     {
         return _studentName;
-    }
+    }
 }
