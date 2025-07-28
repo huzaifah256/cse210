@@ -1,23 +1,39 @@
 using System;
+using System.IO;
 
 class Program
 {
     static void Main(string[] args)
     {
-        Fraction f1 = new Fraction();
-        Console.WriteLine(f1.GetFractionString());
-        Console.WriteLine(f1.GetDecimalValue());
+        // Load a scripture
+        Reference reference = new Reference("Proverbs", 3, 5, 6);
+        string text = "Trust in the Lord with all thine heart and lean not unto thine own understanding.";
+        Scripture scripture = new Scripture(reference, text);
 
-        Fraction f2 = new Fraction(5);
-        Console.WriteLine(f2.GetFractionString());
-        Console.WriteLine(f2.GetDecimalValue());
+        Console.WriteLine("Welcome to the Scripture Memorizer Program!");
 
-        Fraction f3 = new Fraction(3, 4);
-        Console.WriteLine(f3.GetFractionString());
-        Console.WriteLine(f3.GetDecimalValue());
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine(scripture.GetDisplayText());
 
-        Fraction f4 = new Fraction(1, 3);
-        Console.WriteLine(f4.GetFractionString());
-        Console.WriteLine(f4.GetDecimalValue());
+            if (scripture.IsCompletelyHidden())
+            {
+                Console.WriteLine("\nYou have successfully memorized the scripture!");
+                break;
+            }
+
+            Console.WriteLine("\nPress Enter to hide more words or type 'quit' to exit.");
+            string input = Console.ReadLine();
+
+            if (input?.ToLower() == "quit")
+            {
+                break;
+            }
+
+            scripture.HideRandomWords(3);
+        }
+
+        Console.WriteLine("Thank you for using the Scripture Memorizer Program!");
     }
 }
