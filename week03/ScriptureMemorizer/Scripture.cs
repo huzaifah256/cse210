@@ -10,5 +10,5 @@ public class Scripture
 
     public void HideRandomWords(int numberToHide) { }
     public string GetDisplayText() { return ""; }
-    public bool IsCompletelyHidden() { return false; }
+    public bool IsCompletelyHidden() { return false; }
 }
