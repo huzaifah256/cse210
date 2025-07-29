@@ -1,2 +1,1 @@
-[InternetShortcut]
-URL=https://github.com/LUKWAGO1/cse210-hw/blob/main/week06/EternalQuest/goals.txt
+0,1,0,19/02/2025 01:44:07

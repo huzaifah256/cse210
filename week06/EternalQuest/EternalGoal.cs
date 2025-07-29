@@ -1,26 +1,14 @@
-public class EternalGoal : Goal
+// EternalGoal: Never fully complete, gains points every time recorded
+class EternalGoal : Goal
 {
-    private int TimesCompleted { get; set; }
+    public EternalGoal(string name, int points) : base(name, points) { }
 
-    public EternalGoal(string name, string description, int points) 
-        :base(name, description, points)
+    public override void RecordEvent(ref int score)
     {
-        TimesCompleted = 0;
+        score += Points;
+        Console.WriteLine($"Recorded '{Name}'. You earned {Points} points.");
     }
 
-    public override void Complete()
-    {
-        TimesCompleted++;
-        Console.WriteLine($"You recorded progress for: {Name}");
-    }
-
-    public override void DisplayGoal()
-    {
-        Console.WriteLine($"[ ] {Name}: {Description} (Points: {Points} each time) - Completed {TimesCompleted} times");
-    }
-
-    public override int GetPoints()
-    {
-        return Points * TimesCompleted;
-    }
+    public override string GetStatus() => "[∞]";
+    public override string Serialize() => $"Eternal,{Name},{Points}";
 }

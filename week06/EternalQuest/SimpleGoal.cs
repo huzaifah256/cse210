@@ -1,2 +1,19 @@
-[InternetShortcut]
-URL=https://github.com/LUKWAGO1/cse210-hw/blob/main/week06/EternalQuest/SimpleGoal.cs
+public class SimpleGoal : Goal
+{
+    public SimpleGoal(string name, string description, int points) 
+        : base(name, description, points) { }
+
+    public override void Complete()
+    {
+        if (!IsCompleted)
+        {
+            IsCompleted = true;
+            Console.WriteLine($"Congratulations! You have completed: {Name}");
+        }
+    }
+
+    public override int GetPoints()
+    {
+        return IsCompleted ? Points : 0;
+    }
+}
