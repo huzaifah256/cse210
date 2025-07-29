@@ -1,5 +1,3 @@
-using System;
-
 public class Word
 {
     private string _text;
@@ -7,27 +5,11 @@ public class Word
 
     public Word(string text)
     {
-        _text = text;
-        _isHidden = false;
+        // Initialize text and set _isHidden to false
     }
 
-    public void Hide()
-    {
-        _isHidden = true;
-    }
-
-    public void Show()
-    {
-        _isHidden = false;
-    }
-
-    public bool IsHidden()
-    {
-        return _isHidden;
-    }
-
-    public string GetDisplayText()
-    {
-        return _isHidden ? new string(',', _text.Length): _text;
-    }
+    public void Hide() { }
+    public void Show() { }
+    public bool IsHidden() { return false; }
+    public string GetDisplayText() { return ""; }
 }

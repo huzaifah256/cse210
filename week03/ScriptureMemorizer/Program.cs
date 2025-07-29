@@ -35,5 +35,5 @@ class Program
         }
 
         Console.WriteLine("Thank you for using the Scripture Memorizer Program!");
-    }
+    }
 }
