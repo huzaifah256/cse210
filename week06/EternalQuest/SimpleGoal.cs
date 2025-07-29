@@ -1,19 +1,22 @@
-public class SimpleGoal : Goal
+// SimpleGoal: Completed once, earns points
+class SimpleGoal : Goal
 {
-    public SimpleGoal(string name, string description, int points) 
-        : base(name, description, points) { }
+    public SimpleGoal(string name, int points) : base(name, points) { }
 
-    public override void Complete()
+    public override void RecordEvent(ref int score)
     {
         if (!IsCompleted)
         {
             IsCompleted = true;
-            Console.WriteLine($"Congratulations! You have completed: {Name}");
+            score += Points;
+            Console.WriteLine($"Goal '{Name}' completed! You earned {Points} points.");
+        }
+        else
+        {
+            Console.WriteLine($"Goal '{Name}' is already completed.");
         }
     }
 
-    public override int GetPoints()
-    {
-        return IsCompleted ? Points : 0;
-    }
+    public override string GetStatus() => IsCompleted ? "[X]" : "[ ]";
+    public override string Serialize() => $"Simple,{Name},{Points},{IsCompleted}";
 }

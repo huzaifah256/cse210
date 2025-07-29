@@ -1,24 +1,22 @@
-public abstract class Goal
-{
-    public string Name { get; set; }
-    public string Description { get; set; }
-    public int Points { get; set; }
-    public bool IsCompleted { get; protected set; }  // Added to track completion
+using System;
+using System.Collections.Generic;
+using System.IO;
 
-    public Goal(string name, string description, int points)
+// Base class for all goals
+abstract class Goal
+{
+    protected string Name;
+    protected int Points;
+    protected bool IsCompleted;
+
+    public Goal(string name, int points)
     {
         Name = name;
-        Description = description;
         Points = points;
         IsCompleted = false;
     }
 
-    public virtual void DisplayGoal()
-    {
-        string checkbox = IsCompleted ? "[X]" : "[ ]";
-        Console.WriteLine($"{checkbox} {Name}: {Description} (Points: {Points})");
-    }
-
-    public abstract void Complete();
-    public abstract int GetPoints();
+    public abstract void RecordEvent(ref int score);
+    public abstract string GetStatus();
+    public abstract string Serialize();
 }

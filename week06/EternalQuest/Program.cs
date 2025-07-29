@@ -1,176 +1,203 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
+// Enhanced Eternal Quest Program
+// Added Features:
+// 1. Level System - Users gain levels based on score milestones
+//    - Gain a new level every 1000 points
+//    - Celebratory message with 🎉 when leveling up
+//    - Shows progress to next level
+//
+// 2. Daily Streak System
+//    - Tracks consecutive daily logins
+//    - Awards bonus points (10 points × streak days)
+//    - Encourages daily program engagement
+//    - Resets if a day is missed
+//
+// 3. Negative Goals Feature
+//    - Allows tracking of bad habits
+//    - Subtracts points when bad habits occur
+//    - Adds accountability to the goal system
+//
+// 4. Enhanced Statistics Display
+//    - Shows current level
+//    - Displays streak count
+//    - Shows total score
+//    - Provides immediate feedback
+//
+// These features exceed the base requirements by adding multiple
+// gamification elements (levels, streaks), implementing negative goals,
+// and creating a more engaging experience with both positive reinforcement
+// and accountability mechanics.
+// Main program class
 class Program
 {
-    private static List<Goal> goals = new List<Goal>();
-    private static int totalScore = 0;
+    static List<Goal> goals = new List<Goal>();
+    static int score = 0;
+    static int level = 1;
+    static DateTime lastLogin = DateTime.Now;
+    static int streakDays = 0;
 
-    static void Main(string[] args)
+    static void Main()
     {
-        bool running = true;
-        while (running)
+        LoadGoals();
+        CheckDailyStreak();
+        
+        while (true)
         {
-            Console.WriteLine($"\nYou have {totalScore} points.\n");
-            Console.WriteLine("Menu Options:");
-            Console.WriteLine("1. Create New Goal");
-            Console.WriteLine("2. List Goals");
-            Console.WriteLine("3. Save Goals");
-            Console.WriteLine("4. Load Goals");
-            Console.WriteLine("5. Record Event");
-            Console.WriteLine("6. Quit");
+            Console.WriteLine($"\nEternal Quest Program - Level {level}");
+            Console.WriteLine($"Score: {score} | Streak: {streakDays} days");
+            Console.WriteLine("1. Create Goal");
+            Console.WriteLine("2. Record Event");
+            Console.WriteLine("3. List Goals");
+            Console.WriteLine("4. Show Stats");
+            Console.WriteLine("5. Create Negative Goal");
+            Console.WriteLine("6. Save & Exit");
+            Console.Write("Choose an option: ");
             
             string choice = Console.ReadLine();
-            
             switch (choice)
             {
-                case "1":
-                    CreateGoal();
-                    break;
-                case "2":
-                    ListGoals();
-                    break;
-                case "3":
-                    SaveGoals();
-                    break;
-                case "4":
-                    LoadGoals();
-                    break;
-                case "5":
-                    RecordEvent();
-                    break;
-                case "6":
-                    running = false;
-                    break;
+                case "1": CreateGoal(); break;
+                case "2": RecordEvent(); break;
+                case "3": ShowGoals(); break;
+                case "4": ShowStats(); break;
+                case "5": CreateNegativeGoal(); break;
+                case "6": SaveGoals(); return;
+                default: Console.WriteLine("Invalid choice."); break;
             }
         }
     }
 
-    private static void CreateGoal()
+    static void ShowStats()
     {
-        Console.WriteLine("\n1. Simple Goal");
-        Console.WriteLine("2. Eternal Goal");
-        Console.WriteLine("3. Checklist Goal");
-        Console.Write("Which type of goal would you like to create? ");
-        
-        string type = Console.ReadLine();
-        Console.Write("Name: ");
+        Console.WriteLine($"\nLevel: {level}");
+        Console.WriteLine($"Total Score: {score}");
+        Console.WriteLine($"Daily Streak: {streakDays} days");
+        Console.WriteLine($"Goals Created: {goals.Count}");
+        Console.WriteLine($"XP to next level: {(level * 1000) - score}");
+    }
+
+    static void CreateGoal()
+    {
+        Console.Write("Enter goal name: ");
         string name = Console.ReadLine();
-        Console.Write("Description: ");
-        string description = Console.ReadLine();
-        Console.Write("Points: ");
+        Console.WriteLine("Choose type: 1. Simple  2. Eternal  3. Checklist");
+        string type = Console.ReadLine();
+        Console.Write("Enter points: ");
         int points = int.Parse(Console.ReadLine());
 
-        Goal newGoal;
-        switch (type)
+        if (type == "1") goals.Add(new SimpleGoal(name, points));
+        else if (type == "2") goals.Add(new EternalGoal(name, points));
+        else if (type == "3")
         {
-            case "1":
-                newGoal = new SimpleGoal(name, description, points);
-                break;
-            case "2":
-                newGoal = new EternalGoal(name, description, points);
-                break;
-            case "3":
-                Console.Write("How many times does this goal need to be accomplished? ");
-                int target = int.Parse(Console.ReadLine());
-                Console.Write("What is the bonus for accomplishing it that many times? ");
-                int bonus = int.Parse(Console.ReadLine());
-                newGoal = new ChecklistGoal(name, description, points, target, bonus);
-                break;
-            default:
-                Console.WriteLine("Invalid goal type.");
-                return;
+            Console.Write("Enter target count: ");
+            int targetCount = int.Parse(Console.ReadLine());
+            Console.Write("Enter bonus points: ");
+            int bonusPoints = int.Parse(Console.ReadLine());
+            goals.Add(new ChecklistGoal(name, points, targetCount, bonusPoints));
         }
-
-        goals.Add(newGoal);
+        Console.WriteLine("Goal created successfully!");
     }
 
-    private static void ListGoals()
+    static void CreateNegativeGoal()
     {
-        for (int i = 0; i < goals.Count; i++)
-        {
-            Console.Write($"{i + 1}. ");
-            goals[i].DisplayGoal();
-        }
+        Console.Write("Enter bad habit to avoid: ");
+        string name = Console.ReadLine();
+        Console.Write("Enter points to lose: ");
+        int points = int.Parse(Console.ReadLine());
+        goals.Add(new NegativeGoal(name, points));
+        Console.WriteLine("Negative goal created! Avoid this to maintain your score!");
     }
 
-    private static void RecordEvent()
+    static void RecordEvent()
     {
-        ListGoals();
-        Console.Write("Which goal did you accomplish? ");
+        ShowGoals();
+        Console.Write("Enter goal number to record: ");
         int index = int.Parse(Console.ReadLine()) - 1;
-        
         if (index >= 0 && index < goals.Count)
         {
-            goals[index].Complete();
-            int pointsEarned = goals[index].GetPoints();
-            totalScore += pointsEarned;
-            Console.WriteLine($"You now have {totalScore} points!");
+            goals[index].RecordEvent(ref score);
+            CheckLevelUp();
         }
+        else
+            Console.WriteLine("Invalid goal number.");
     }
 
-    private static void SaveGoals()
+    static void ShowGoals()
+    {
+        Console.WriteLine("\nGoals:");
+        for (int i = 0; i < goals.Count; i++)
+            Console.WriteLine($"{i + 1}. {goals[i].GetStatus()} {goals[i].Serialize()}");
+    }
+
+    static void SaveGoals()
     {
         using (StreamWriter writer = new StreamWriter("goals.txt"))
         {
-            writer.WriteLine(totalScore);
+            writer.WriteLine($"{score},{level},{streakDays},{lastLogin}");
             foreach (Goal goal in goals)
-            {
-                writer.WriteLine($"{goal.GetType().Name}|{goal.Name}|{goal.Description}|{goal.Points}|{goal.IsCompleted}");
-                if (goal is ChecklistGoal checklistGoal)
-                {
-                    writer.WriteLine($"{checklistGoal.Progress}|{checklistGoal.Target}|{checklistGoal.BonusPoints}");
-                }
-            }
+                writer.WriteLine(goal.Serialize());
         }
+        Console.WriteLine("Goals saved successfully!");
     }
 
-    private static void LoadGoals()
+    static void LoadGoals()
     {
         if (File.Exists("goals.txt"))
         {
-            goals.Clear();
             string[] lines = File.ReadAllLines("goals.txt");
-            totalScore = int.Parse(lines[0]);
-            
+            string[] stats = lines[0].Split(',');
+            score = int.Parse(stats[0]);
+            level = int.Parse(stats[1]);
+            streakDays = int.Parse(stats[2]);
+            lastLogin = DateTime.Parse(stats[3]);
+
             for (int i = 1; i < lines.Length; i++)
             {
-                string[] parts = lines[i].Split('|');
+                string[] parts = lines[i].Split(',');
                 switch (parts[0])
                 {
-                    case "SimpleGoal":
-                    case "EternalGoal":
-                        goals.Add(CreateGoalFromParts(parts));
+                    case "Simple": 
+                        goals.Add(new SimpleGoal(parts[1], int.Parse(parts[2]))); 
                         break;
-                    case "ChecklistGoal":
-                        string[] extraParts = lines[++i].Split('|');
-                        goals.Add(CreateChecklistGoalFromParts(parts, extraParts));
+                    case "Eternal": 
+                        goals.Add(new EternalGoal(parts[1], int.Parse(parts[2]))); 
+                        break;
+                    case "Checklist":
+                        goals.Add(new ChecklistGoal(parts[1], int.Parse(parts[2]), 
+                            int.Parse(parts[3]), int.Parse(parts[5])));
+                        break;
+                    case "Negative":
+                        goals.Add(new NegativeGoal(parts[1], int.Parse(parts[2])));
                         break;
                 }
             }
+            Console.WriteLine("Goals loaded successfully!");
         }
     }
 
-    private static Goal CreateGoalFromParts(string[] parts)
+    static void CheckLevelUp()
     {
-        if (parts[0] == "SimpleGoal")
-            return new SimpleGoal(parts[1], parts[2], int.Parse(parts[3]));
-        else
-            return new EternalGoal(parts[1], parts[2], int.Parse(parts[3]));
+        int newLevel = (score / 1000) + 1;
+        if (newLevel > level)
+        {
+            Console.WriteLine($"\n🎉 LEVEL UP! You are now level {newLevel}!");
+            level = newLevel;
+        }
     }
 
-    private static Goal CreateChecklistGoalFromParts(string[] parts, string[] extraParts)
+    static void CheckDailyStreak()
     {
-        var goal = new ChecklistGoal(
-            parts[1], 
-            parts[2], 
-            int.Parse(parts[3]), 
-            int.Parse(extraParts[1]), 
-            int.Parse(extraParts[2])
-        );
-        goal.Progress = int.Parse(extraParts[0]);
-        return goal;
+        if ((DateTime.Now - lastLogin).Days == 1)
+        {
+            streakDays++;
+            int bonus = streakDays * 10;
+            score += bonus;
+            Console.WriteLine($"Daily Streak Bonus: +{bonus} points!");
+        }
+        else if ((DateTime.Now - lastLogin).Days > 1)
+        {
+            streakDays = 0;
+            Console.WriteLine("Streak reset! Log in daily to maintain your streak!");
+        }
+        lastLogin = DateTime.Now;
     }
 }
